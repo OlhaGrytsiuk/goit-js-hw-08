@@ -1,41 +1,31 @@
 import throttle from 'lodash.throttle';
 
 const form = document.querySelector('.feedback-form');
-const email = document.querySelector('input[name="email"]');
-const message = document.querySelector('textarea[name="message"]');
+const email = document.querySelector('.feedback-form input');
+const message = document.querySelector('.feedback-form textarea');
 const LOCALSTORAGE_KEY = 'feedback-form-state';
+populateForm();
+form.addEventListener('input', throttle(onMessageInput), 500);
+form.addEventListener('submit', onFormSubmit);
 
-form.addEventListener(
-  'input',
-  throttle(e => {
-    const objectToSave = { email: email.value, message: message.value };
-    localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(objectToSave));
-  }, 500)
-);
+function onMessageInput(event) {
+  const objectSave = { email: email.value, message: message.value };
+  localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(objectSave));
+}
 
-form.addEventListener('submit', e => {
-  e.preventDefault();
-
+function onFormSubmit(event) {
+  event.preventDefault();
   if (email.value === '' || message.value === '') {
-    return alert('Заповніть всі поля!');
+    return alert('Заповніть поля!');
   }
-
   console.log({ email: email.value, message: message.value });
-  form.reset();
+  event.currentTarget.reset();
   localStorage.removeItem(LOCALSTORAGE_KEY);
-});
-
-const load = key => {
-  try {
-    const serializedState = localStorage.getItem(key);
-    return serializedState === null ? undefined : JSON.parse(serializedState);
-  } catch (error) {
-    console.error('Get state error: ', error.message);
+}
+function populateForm() {
+  const savedObject = JSON.parse(localStorage.getItem(LOCALSTORAGE_KEY));
+  if (savedObject) {
+    email.value = savedObject.email;
+    message.value = savedObject.message;
   }
-};
-
-const storageData = load(LOCALSTORAGE_KEY);
-if (storageData) {
-  email.value = storageData.email;
-  message.value = storageData.message;
 }
