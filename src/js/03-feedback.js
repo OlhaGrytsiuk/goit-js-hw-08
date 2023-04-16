@@ -8,7 +8,7 @@ populateForm();
 form.addEventListener('input', throttle(onMessageInput, 500));
 form.addEventListener('submit', onFormSubmit);
 
-function onMessageInput(event) {
+function onMessageInput() {
   const objectSave = { email: email.value, message: message.value };
   localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(objectSave));
 }
